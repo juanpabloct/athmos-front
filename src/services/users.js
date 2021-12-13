@@ -24,3 +24,8 @@ export const deleteUser = (id) => {
 export const editUser = (id, data) => {
     return client.put(`/users/${id}`, data)
 }
+
+export const getUserCourses = async (id) => {
+    const { data } = await client.get(`/users/${id}/courses`)
+    return data
+}

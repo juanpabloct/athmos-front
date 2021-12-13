@@ -18,9 +18,9 @@
     />
     <b-table striped hover :items="items" :fields="fields">
       <template #cell(actions)="{ item }">
-        <router-link class="me-2" :to="'/courses/' + item.id">
-          <b-button size="sm"> Ver </b-button>
-        </router-link>
+        <b-button class="me-2" :to="'/courses/' + item.id" size="sm">
+          Ver
+        </b-button>
         <b-button
           size="sm"
           class="me-2"
@@ -35,7 +35,7 @@
         >
           Editar
         </b-button>
-        <b-button size="sm" @click="eliminarUsuario(row.item)" variant="danger">
+        <b-button size="sm" @click="eliminarUsuario(item)" variant="danger">
           Eliminar
         </b-button>
       </template>

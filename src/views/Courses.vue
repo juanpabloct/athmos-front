@@ -1,16 +1,32 @@
 <template>
-  <b-container class="about">
+  <b-container>
+    <b-breadcrumb>
+      <b-breadcrumb-item to="/">
+        <b-icon
+          icon="house-fill"
+          scale="1.25"
+          shift-v="1.25"
+          aria-hidden="true"
+        ></b-icon>
+        Usuarios
+      </b-breadcrumb-item>
+    </b-breadcrumb>
     <div v-if="loading">Cargando...</div>
-    <div v-else>User: {{ user }}</div>
+    <div v-else>
+      <div>Nombre de usuario: {{ user.username }}</div>
+      <div>Correo del usuario: {{ user.email }}</div>
+    </div>
     <b-row>
       <b-col>
-        <b-button v-b-modal.create>Launch demo modal</b-button>
+        <div class="d-flex justify-content-center my-4">
+          <b-button variant="primary" size="sm" v-b-modal.create>
+            Crear curso
+          </b-button>
+        </div>
 
         <b-modal id="create" title="BootstrapVue" @cancel="cancel" @ok="crear">
-          <p class="my-4">Hello from modal!</p>
-
           <b-row>
-            <b-col sm="12" md="4">
+            <b-col sm="12" md="12" lg="">
               <b-form-group
                 label="Nombre del curso"
                 label-for="name"
@@ -18,6 +34,8 @@
               >
                 <b-form-input id="name" v-model="form.name" trim></b-form-input>
               </b-form-group>
+            </b-col>
+            <b-col sm="12" md="12" lg="">
               <b-form-group
                 label="Description"
                 label-for="description"
@@ -35,12 +53,18 @@
       </b-col>
     </b-row>
 
-    <b-table striped hover :fields="fields" :items="courses" />
+    <b-table striped hover :fields="fields" :items="courses">
+      <template #cell(actions)="{ item }">
+        <b-button size="sm" @click="deleteCourse(item)" variant="danger">
+          Eliminar
+        </b-button>
+      </template>
+    </b-table>
   </b-container>
 </template>
 <script>
-import { getUserCourses, getUser } from "../services/users";
-import { createCourse } from "../services/courses";
+import * as usersApi from "../services/users";
+import * as coursesApi from "../services/courses";
 
 export default {
   name: "Courses",
@@ -78,24 +102,36 @@ export default {
     this.getUser();
   },
   methods: {
+    resetForm() {
+      this.form = {
+        name: "",
+        description: "",
+      };
+    },
     getCourses() {
-      getUserCourses(this.id).then((data) => {
+      usersApi.getUserCourses(this.id).then((data) => {
         this.courses = data;
       });
     },
     getUser() {
       this.loading = true;
-      getUser(this.id).then((data) => {
+      usersApi.getUser(this.id).then((data) => {
         this.user = data;
         this.loading = false;
       });
     },
     cancel() {
-      this.form.name = "";
+      this.resetForm();
     },
-    crear() {
+    async crear() {
       const { name, description } = this.form;
-      createCourse({ user_id: this.id, name, description });
+      await coursesApi.createCourse({ user_id: this.id, name, description });
+      this.getCourses();
+    },
+    deleteCourse(course) {
+      coursesApi.deleteCourse(course.id).then(() => {
+        this.getCourses();
+      });
     },
   },
 };
